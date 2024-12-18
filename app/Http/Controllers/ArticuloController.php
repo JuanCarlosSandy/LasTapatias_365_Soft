@@ -322,7 +322,8 @@ class ArticuloController extends Controller
         //$articulo->codigo = $request->codigo;
 
         $articulo->nombre_generico = $articulo->nombre; //aumete 12julio
-
+        $articulo->tipoMenu = $request->tipo_menu;
+        
         $articulo->unidad_paquete = $request->unidad_paquete;
         $articulo->precio_venta = $request->precio_venta;
         //$articulo->costo_compra = '0.00'; //new
