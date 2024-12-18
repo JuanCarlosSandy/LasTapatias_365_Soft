@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
@@ -84,6 +85,9 @@ class ArticuloController extends Controller
         $criterio = $request->criterio;
         $sucursalId = $request->idSucursalActual;
 
+        $user = Auth::user();
+        $tipo_menu = $user->tipoMenu;
+
         $articulosQuery = Articulo::join('categoria_producto', 'articulos.idcategoria_producto', '=', 'categoria_producto.id')
             ->leftJoin(DB::raw('(SELECT idarticulo, idalmacen, SUM(saldo_stock) as total_saldo_stock FROM inventarios GROUP BY idarticulo, idalmacen) as inventarios'), function($join) {
                 $join->on('articulos.id', '=', 'inventarios.idarticulo');
@@ -113,6 +117,7 @@ class ArticuloController extends Controller
                 'almacens.nombre_almacen',
                 'sucursales.nombre as nombre_sucursal'
             )
+            ->where('articulos.tipoMenu','=', $tipo_menu)
             ->orderBy('articulos.id', 'desc');
 
         if ($buscar != null) {
@@ -151,7 +156,7 @@ class ArticuloController extends Controller
                     //'articulos.idmedida',
                     'articulos.nombre',
                     'articulos.codigo',
-
+                    'articulos.tipoMenu',
                     'articulos.nombre_generico',
 
                     'categoria_producto.nombre as nombre_categoria',
@@ -322,8 +327,7 @@ class ArticuloController extends Controller
         //$articulo->codigo = $request->codigo;
 
         $articulo->nombre_generico = $articulo->nombre; //aumete 12julio
-        $articulo->tipoMenu = $request->tipo_menu;
-        
+
         $articulo->unidad_paquete = $request->unidad_paquete;
         $articulo->precio_venta = $request->precio_venta;
         //$articulo->costo_compra = '0.00'; //new
@@ -333,6 +337,7 @@ class ArticuloController extends Controller
         $articulo->precio_costo_unid = $request->precio_costo_unid;
         $articulo->precio_costo_paq = $request->precio_costo_paq;
         $articulo->descripcion = $request->descripcion;
+        $articulo->tipoMenu = $request->tipo_menu;
         //$articulo->fecha_vencimiento = $request->fecha_vencimiento;
         $articulo->condicion = '1';
         if ($request->hasFile('fotografia')) {
@@ -381,6 +386,7 @@ class ArticuloController extends Controller
             $articulo->precio_venta = $request->precio_venta;
             $articulo->stockmin = $request->stock;
             $articulo->descripcion = $request->descripcion;
+            $articulo->tipoMenu = $request->tipo_menu;
             //$articulo->fecha_vencimiento = $request->fecha_vencimiento;
             $articulo->idproveedor = $request->idproveedor;
             //$articulo->idmedida = $request->idmedida;
