@@ -13,7 +13,7 @@
                     </SelectButton>
                     </div>-->
                     <template #header>
-                        <div v-if="tipoMenu === 1" class="header-container">
+                        <div v-if="tipoMenu === 2" class="header-container">
                             <h6>Seleccione una cantidad para habilitar los productos:</h6>
                             <SelectButton v-model="cantidadSeleccionada" :options="cantidades" dataKey="value">
                                 <template #option="slotProps">
@@ -48,7 +48,7 @@
                                     class="product-container" 
                                     :class="{
                                         'disabled-product': 
-                                            (categoria_general === 'comidas' && tipoMenu === 1 && !cantidadSeleccionada) ||
+                                            (categoria_general === 'comidas' && tipoMenu === 2 && !cantidadSeleccionada) ||
                                             (tipoMenu === 1 && categoria_general === 'comidas')
                                     }" 
                                     @click.stop="(categoria_general !== 'comidas' || cantidadSeleccionada || tipoMenu === 2) && agregarDetalleModal(slotProps.data)"
