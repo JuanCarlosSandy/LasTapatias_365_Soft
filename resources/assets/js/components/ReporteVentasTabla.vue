@@ -25,6 +25,7 @@
                                     <th>Usuario</th>
                                     <th>Cliente</th>
                                     <th>Número Ticket</th>
+                                    <th>Mesa</th>
                                     <th>Fecha Hora</th>
                                     <th>Total</th>
                                     <th>Estado</th>
@@ -53,6 +54,7 @@
                                     <td v-text="venta.usuario"></td>
                                     <td v-text="venta.razonSocial"></td>
                                     <td v-text="venta.num_comprobante"></td>
+                                    <td v-text="venta.mesa"></td>
                                     <td v-text="venta.fecha_hora"></td>
                                     <td v-text="venta.total"></td>
                                     <td v-text="venta.estado"></td>

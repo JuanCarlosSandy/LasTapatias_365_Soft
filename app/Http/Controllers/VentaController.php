@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mesa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
@@ -94,6 +95,7 @@ class VentaController extends Controller
                         'ventas.tipo_comprobante as tipo_comprobante',
                         'ventas.serie_comprobante',
                         'ventas.num_comprobante as num_comprobante',
+                        'ventas.mesa as mesa',
                         'ventas.fecha_hora as fecha_hora',
                         'ventas.impuesto as impuesto',
                         'ventas.total as total',
@@ -111,6 +113,7 @@ class VentaController extends Controller
                         'ventas.tipo_comprobante as tipo_comprobante',
                         'ventas.serie_comprobante',
                         'ventas.num_comprobante as num_comprobante',
+                        'ventas.mesa as mesa',
                         'ventas.fecha_hora as fecha_hora',
                         'ventas.impuesto as impuesto',
                         'ventas.total as total',
@@ -619,6 +622,7 @@ class VentaController extends Controller
                             $venta->total = $request->total; }
 
                         $venta->tipoEntrega = $request->tipoEntrega;
+                        $venta->mesa = $request->idMesa;
                         $venta->observacion = $request->observacion;
                         $venta->estado = 'Registrado';
                         $venta->idcaja = $ultimaCaja->id;
@@ -1904,6 +1908,7 @@ class VentaController extends Controller
             'ventas.cliente',
             'ventas.documento',
             'ventas.num_comprobante',
+            'ventas.mesa',
             'ventas.created_at',
             'ventas.impuesto',
             'ventas.total',
@@ -1969,6 +1974,7 @@ class VentaController extends Controller
     $tipoentrega = $venta->tipoEntrega;
     $tipopago = $venta->Tipo_venta;
     $observacion = $venta->observacion;
+    $mesa = $venta->mesa;
 
     $pdf->AddPage('P', array(70, 150));
     $pdf->SetMargins(5, 5); 
@@ -1989,6 +1995,10 @@ class VentaController extends Controller
     // Nombre del cliente
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(0, 6, "Cliente: $cliente", 0, 1 , 'C');
+    
+    //Numero de Mesa
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(0, 6, "Mesa: $mesa", 0, 1 , 'C');
 
     //Tipo de Orden
     $pdf->SetFont('Arial', 'B', 9);
@@ -2999,6 +3009,11 @@ class VentaController extends Controller
             'ventas' => $ventas
             //'totalGanado' => $totalGanado
         ]);
+    }
+
+    public function listarMesas(){
+        $mesas = Mesa::all();
+        return response()->json($mesas);
     }
 
 }

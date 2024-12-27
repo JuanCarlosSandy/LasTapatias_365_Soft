@@ -423,6 +423,8 @@ Route::put('/menu/activar', 'MenuController@activar');
         Route::get('/delivery/selectDelivery', 'DeliveryController@selectDelivery');
         Route::get('/api/delivery/telf', 'DeliveryController@recuperarTelf');
 
+        Route::get('/mesas', 'VentaController@listarMesas');
+
     });
 
     //RUTA PARA RECUPERAR LA SESSION CON EL ID DE LA PERSONA LOGUEADA
