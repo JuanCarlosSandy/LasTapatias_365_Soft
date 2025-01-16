@@ -2049,6 +2049,7 @@ export default {
                         this.telefono_delivery = '';
                         this.tarifa_delivery = '';
                         this.tipo_entrega = '';
+                        this.cantidadSeleccionada = null;
 
                         return;
 
