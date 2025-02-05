@@ -1951,7 +1951,7 @@ export default {
                     'documento': this.documento,
                     'tipoEntrega': tipoEntregaValor,
                     'idMesa': idMesa, 
-                    'observacion': this.cantidadSeleccionada.value,
+                    'observacion': this.cantidadSeleccionada && this.cantidadSeleccionada.value ? this.cantidadSeleccionada.value : null,
                     'numero_cuotasCredito': this.numero_cuotas,
                     'tiempo_dias_cuotaCredito': this.tiempo_diaz,
                     'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
