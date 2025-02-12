@@ -619,7 +619,7 @@ export default {
                 //{icon: 'pi pi-car', label: 'Delivery', value: 'Entregas'}
             ],
 
-            categorias_lista: [
+            /*categorias_lista: [
                 {
                     label: 'Categorias',
                     items: [{
@@ -637,7 +637,7 @@ export default {
                         }
                     }
                 ]}
-            ],
+            ],*/
 
             lista_subcategorias: [],
             subcategoria_seleccionada: 'todos',
@@ -890,6 +890,32 @@ export default {
                 from++;
             }
             return pagesArray;
+        },
+
+        categorias_lista() {
+            return [
+                {
+                    label: 'Categorias',
+                    items: [
+                        {
+                            label: 'Arma tu Orden',
+                            icon: 'pi pi-bookmark-fill',
+                            command: () => {
+                                this.categoriaSeleccionada = 'Comidas';
+                                this.updateProducts('Comidas');
+                            }
+                        },
+                        {
+                            label: 'Otro Menú',
+                            icon: 'pi pi-bookmark-fill',
+                            command: () => {
+                                this.categoriaSeleccionada = 'Bebidas';
+                                this.updateProducts('Bebidas');
+                            }
+                        }
+                    ]
+                }
+            ];
         },
 
         /*calcularTotal: function () {
@@ -1207,6 +1233,16 @@ export default {
                 this.listarProducto(this.buscar, this.criterio, this.id_sucursal_actual);
                 this.categoria_general = 'bebidas';
             }
+        },
+
+        setCategoriaInicial() {
+            if (this.tipoMenu === 1) {
+                this.categoriaSeleccionada = 'Bebidas'; 
+            } else if (this.tipoMenu === 2) {
+                this.categoriaSeleccionada = 'Comidas'; 
+            }
+            console.log("LA TIPO MENU ES: ", this.tipoMenu);
+            this.updateProducts(this.categoriaSeleccionada);
         },
 
         verificarEstado() {
@@ -1777,6 +1813,8 @@ export default {
                 this.tipoMenu = response.data.usuario.tipoMenu;
 
                 console.log("El tipoMenu del usuario es: " + this.tipoMenu);
+
+                this.setCategoriaInicial();
 
                 // Puedes descomentar o añadir las funciones necesarias
                 // this.listarMenu(this.id_sucursal_actual);
