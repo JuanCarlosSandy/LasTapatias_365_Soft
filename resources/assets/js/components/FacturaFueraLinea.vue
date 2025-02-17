@@ -1893,6 +1893,7 @@ export default {
                 }else{
                     this.idsucursalventa = this.idsucursalusuario;
                 }
+                console.log("LA CANTIDAD SELECCIONADA ES: ", this.cantidadSeleccionada.value);
 
                 const ventaResponse = await axios.post('/venta/registrar', {
                     'idcliente': this.idcliente,
