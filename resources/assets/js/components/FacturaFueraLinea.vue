@@ -13,7 +13,7 @@
                     </SelectButton>
                     </div>-->
                     <template #header>
-                        <div v-if="tipoMenu === 1" class="header-container">
+                        <div v-if="tipoMenu === 2" class="header-container">
                             <h6>Seleccione una cantidad para habilitar los productos:</h6>
                             <SelectButton v-model="cantidadSeleccionada" :options="cantidades" dataKey="value">
                                 <template #option="slotProps">
@@ -48,7 +48,7 @@
                                     class="product-container" 
                                     :class="{
                                         'disabled-product': 
-                                            (categoria_general === 'comidas' && tipoMenu === 1 && !cantidadSeleccionada) ||
+                                            (categoria_general === 'comidas' && tipoMenu === 2 && !cantidadSeleccionada) ||
                                             (tipoMenu === 1 && categoria_general === 'comidas')
                                     }" 
                                     @click.stop="(categoria_general !== 'comidas' || cantidadSeleccionada || tipoMenu === 2) && agregarDetalleModal(slotProps.data)"
@@ -119,7 +119,7 @@
                             </div>
                         </div>
 
-                        <div class="p-col-12 p-md-4">
+                        <div class="p-col-12 p-md-4" style="display: none;">
                             <div class="p-inputgroup">
                                 <span class="p-inputgroup-addon">
                                     <i class="pi pi-id-card"></i>
@@ -142,6 +142,20 @@
                                 </span>
                             </div>
                         </div>
+                        <div class="p-col-12 p-md-4">
+                                <span class="p-float-label">
+                                    <Dropdown
+                                        class="p-inputtext-sm"
+                                        id="mesa"
+                                        v-model="mesaSeleccionada"
+                                        :options="arrayMesas"
+                                        optionLabel="nombre"
+                                        optionValue="id"
+                                        placeholder="Seleccione Mesa"
+                                        @change="onMesaChange"
+                                    />
+                                </span>
+                            </div>
 
                     </div>
 
@@ -191,7 +205,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <!----><div v-show="mostrarDelivery" class="p-grid p-fluid">
                         <Divider />
@@ -606,7 +619,7 @@ export default {
                 //{icon: 'pi pi-car', label: 'Delivery', value: 'Entregas'}
             ],
 
-            categorias_lista: [
+            /*categorias_lista: [
                 {
                     label: 'Categorias',
                     items: [{
@@ -624,7 +637,7 @@ export default {
                         }
                     }
                 ]}
-            ],
+            ],*/
 
             lista_subcategorias: [],
             subcategoria_seleccionada: 'todos',
@@ -758,6 +771,8 @@ export default {
             menu: 0 ,
             tipoPago: 'EFECTIVO',
             cantidadSeleccionada: null,
+            arrayMesas: [],
+            mesaSeleccionada: null,
             cantidades: [
                 { label: '2', value: 2 },
                 { label: '3', value: 3 },
@@ -877,6 +892,32 @@ export default {
             return pagesArray;
         },
 
+        categorias_lista() {
+            return [
+                {
+                    label: 'Categorias',
+                    items: [
+                        {
+                            label: 'Arma tu Orden',
+                            icon: 'pi pi-bookmark-fill',
+                            command: () => {
+                                this.categoriaSeleccionada = 'Comidas';
+                                this.updateProducts('Comidas');
+                            }
+                        },
+                        {
+                            label: 'Otro Menú',
+                            icon: 'pi pi-bookmark-fill',
+                            command: () => {
+                                this.categoriaSeleccionada = 'Bebidas';
+                                this.updateProducts('Bebidas');
+                            }
+                        }
+                    ]
+                }
+            ];
+        },
+
         /*calcularTotal: function () {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
@@ -894,6 +935,8 @@ export default {
         calcularTotal: function () {
             let resultado = 0.0;
 
+            console.log("Iniciando cálculo total...");
+
             // Precios finales según la cantidad seleccionada
             const preciosPorCantidad = {
                 2: 23,
@@ -902,30 +945,41 @@ export default {
                 8: 79
             };
 
-            // Precio inicial basado en la cantidad seleccionada
-            if (preciosPorCantidad[this.cantidadSeleccionada.value]) {
-                resultado = preciosPorCantidad[this.cantidadSeleccionada.value];
-                console.log("Precio inicial basado en cantidad seleccionada: ", resultado);
-            }
+            // Verificar cantidad seleccionada
+            const cantidadSeleccionada = (this.cantidadSeleccionada && this.cantidadSeleccionada.value) ? this.cantidadSeleccionada.value : 0;
+            console.log("Cantidad seleccionada: ", cantidadSeleccionada);
+
+            // Verificar precio basado en la cantidad
+            resultado = preciosPorCantidad[cantidadSeleccionada] || 0;
+            console.log("Precio inicial basado en cantidad seleccionada: ", resultado);
 
             // Sumar el precio de cada producto en arrayDetalle
-            for (let i = 0; i < this.arrayDetalle.length; i++) {
-                let producto = this.arrayDetalle[i];
-                let subtotalProducto = (producto.precio * producto.cantidad - producto.descuento); // Subtotal de cada producto
-                resultado += subtotalProducto; // Sumar al resultado
+            if (Array.isArray(this.arrayDetalle)) {
+                for (let i = 0; i < this.arrayDetalle.length; i++) {
+                    let producto = this.arrayDetalle[i];
+                    if (producto.precio && producto.cantidad) {
+                        let subtotalProducto = (producto.precio * producto.cantidad - (producto.descuento || 0)); // Subtotal de cada producto
+                        resultado += subtotalProducto; // Sumar al resultado
+                    } else {
+                        console.warn("Producto inválido en arrayDetalle: ", producto);
+                    }
+                }
+            } else {
+                console.error("arrayDetalle no es un array o está indefinido.");
             }
 
             // Agregar o restar tarifas adicionales según las condiciones
             if (this.tarifaDeliveryIncluida) {
-                resultado += this.tarifa_delivery;
+                console.log("Agregando tarifa de delivery: ", this.tarifa_delivery);
+                resultado += this.tarifa_delivery || 0;
             } else {
-                resultado -= this.descuentoAdicional;
+                console.log("Aplicando descuento adicional: ", this.descuentoAdicional);
+                resultado -= this.descuentoAdicional || 0;
             }
 
             console.log("TOTAL CALCULADO: ", resultado);
             return resultado;
         },
-
 
         calcularSubTotal: function () {
             var resultado = 0.0;
@@ -933,6 +987,13 @@ export default {
                 resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad - this.arrayDetalle[i].descuento)
             }
             return resultado;
+        },
+
+        listaMesas() {
+            return this.arrayMesas.map(mesa => ({
+                label: mesa.nombre,
+                value: mesa.id
+            }));
         },
 
         badgeSeverity() {
@@ -1172,6 +1233,16 @@ export default {
                 this.listarProducto(this.buscar, this.criterio, this.id_sucursal_actual);
                 this.categoria_general = 'bebidas';
             }
+        },
+
+        setCategoriaInicial() {
+            if (this.tipoMenu === 1) {
+                this.categoriaSeleccionada = 'Bebidas'; 
+            } else if (this.tipoMenu === 2) {
+                this.categoriaSeleccionada = 'Comidas'; 
+            }
+            console.log("LA TIPO MENU ES: ", this.tipoMenu);
+            this.updateProducts(this.categoriaSeleccionada);
         },
 
         verificarEstado() {
@@ -1743,6 +1814,8 @@ export default {
 
                 console.log("El tipoMenu del usuario es: " + this.tipoMenu);
 
+                this.setCategoriaInicial();
+
                 // Puedes descomentar o añadir las funciones necesarias
                 // this.listarMenu(this.id_sucursal_actual);
                 // this.agregarDelivery(this.idrol);
@@ -1859,6 +1932,9 @@ export default {
         },*/
 
         async registrarVenta(idtipo_pago) {
+            let idMesa = this.mesaSeleccionada;
+            console.log("LA MESA ES: ", idMesa);
+
             if (this.validarVenta()) {
                 return;
             }
@@ -1913,7 +1989,8 @@ export default {
                     'cliente': this.cliente,
                     'documento': this.documento,
                     'tipoEntrega': tipoEntregaValor,
-                    'observacion': this.cantidadSeleccionada.value,
+                    'idMesa': idMesa, 
+                    'observacion': this.cantidadSeleccionada && this.cantidadSeleccionada.value ? this.cantidadSeleccionada.value : null,
                     'numero_cuotasCredito': this.numero_cuotas,
                     'tiempo_dias_cuotaCredito': this.tiempo_diaz,
                     'totalCredito': this.primera_cuota ? this.calcularTotal - this.cuotas[0].totalCancelado : this.calcularTotal,
@@ -2011,6 +2088,7 @@ export default {
                         this.telefono_delivery = '';
                         this.tarifa_delivery = '';
                         this.tipo_entrega = '';
+                        this.cantidadSeleccionada = null;
 
                         return;
 
@@ -2066,6 +2144,7 @@ export default {
                         this.telefono_delivery = '';
                         this.tarifa_delivery = '';
                         this.tipo_entrega = '';
+                        this.cantidadSeleccionada= null;
 
                         return;
 
@@ -2409,6 +2488,21 @@ export default {
             this.cantidadSeleccionada = cantidad;
         },
 
+        onMesaChange() {
+            console.log("Mesa seleccionada:", this.mesaSeleccionada);
+        },
+
+        async listarMesas() {
+            try {
+                const response = await axios.get('/mesas');
+                this.arrayMesas = response.data;
+            } catch (error) {
+                console.error("Error al obtener las mesas:", error);
+            }
+        },
+
+        
+
     },
 
     created() {
@@ -2450,6 +2544,7 @@ export default {
         this.listarAlmacenes();
         this.ejecutarFlujoCompleto();
         this.listarMenu();
+        this.listarMesas();
     },
 
     beforeDestroy() {
