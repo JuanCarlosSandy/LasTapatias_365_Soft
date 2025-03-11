@@ -823,7 +823,7 @@ export default {
             reader.readAsDataURL(file);
         },
 
-        /*registrarPersona() {
+        registrarPersona() {
             if (this.validarPersona()) {
                 return;
             }
@@ -870,7 +870,7 @@ export default {
                 );
                 console.log(error);
             });
-        },*/
+        },
 
         actualizarPersona() {
             if (this.validarPersona()) {
