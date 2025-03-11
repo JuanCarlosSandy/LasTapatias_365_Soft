@@ -1969,7 +1969,6 @@ export default {
                 }else{
                     this.idsucursalventa = this.idsucursalusuario;
                 }
-
                 const ventaResponse = await axios.post('/venta/registrar', {
                     'idcliente': this.idcliente,
                     'tipo_comprobante': this.tipo_comprobante,
